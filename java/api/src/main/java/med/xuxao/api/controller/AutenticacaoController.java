@@ -1,6 +1,9 @@
 package med.xuxao.api.controller;
 
 import jakarta.validation.Valid;
+import med.xuxao.api.domain.usuario.Usuario;
+import med.xuxao.api.infra.security.DadosUsuarioToken;
+import med.xuxao.api.infra.security.TokenService;
 import med.xuxao.api.usuario.DadosLogin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +21,16 @@ public class AutenticacaoController {
     @Autowired
     private AuthenticationManager manager;
 
+    @Autowired
+    private TokenService tokenService;
+
     @PostMapping
     public ResponseEntity login(@RequestBody @Valid DadosLogin dados){
-        var token = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
-        var authentication = manager.authenticate(token);
+        var authenticationToken = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
+        var authentication = manager.authenticate(authenticationToken);
+        var tokenJwt = tokenService.gerarToken((Usuario) authentication.getPrincipal());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new DadosUsuarioToken(tokenJwt));
     }
 
 }
