@@ -34,7 +34,6 @@ public class SecurityFilter extends OncePerRequestFilter {
         var tokenJWT = getAuthorizationHeader(request);
         if (tokenJWT != null) {
             var subject = tokenService.getSubject(tokenJWT);
-            System.out.println(subject);
             var usuario = repository.findByLogin(subject);
             var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -48,7 +47,6 @@ public class SecurityFilter extends OncePerRequestFilter {
             var authPartsList = authorization.split(" ");
             var bearer = authPartsList[0];
             var token = authPartsList[1];
-            System.out.println((bearer.trim().equals("Bearer")));
             if(!bearer.trim().equals("Bearer")){
                 throw new RuntimeException("Não foi detectada o envio do token com o Bearer");
             }
